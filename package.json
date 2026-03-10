@@ -1,0 +1,25 @@
+{
+  "name": "controle-financas",
+  "version": "1.0.0",
+  "description": "Projeto Full Stack para gestão de contas do mês (receitas e despesas)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BRdeSC/controle-financas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/BRdeSC/controle-financas/issues"
+  },
+  "homepage": "https://github.com/BRdeSC/controle-financas#readme",
+  "devDependencies": {
+    "@types/node": "^25.4.0",
+    "typescript": "^5.9.3"
+  }
+}
