@@ -8,6 +8,7 @@ build/
 # Variáveis de Ambiente
 .env
 .env.*
+!.env.example
 
 # Ficheiros de Sistema
 .DS_Store
