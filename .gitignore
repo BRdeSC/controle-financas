@@ -12,3 +12,5 @@ build/
 
 # Ficheiros de Sistema
 .DS_Store
+
+/src/generated/prisma
