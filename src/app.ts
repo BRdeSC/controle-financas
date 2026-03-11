@@ -1,17 +1,16 @@
 import express from 'express';
+import transactionRoutes from './routes/transaction.routes'; // <-- Importamos as rotas aqui
 
 const app = express();
 
-// Middleware que permite a nossa API entender arquivos JSON
 app.use(express.json());
 
-// O nosso primeiro Endpoint (A Rota de Saúde)
+// Rota de teste
 app.get('/health', (request, response) => {
-  return response.status(200).json({
-    status: 'OK',
-    message: 'API do Controle de Contas está a funcionar perfeitamente! 🚀',
-    timestamp: new Date().toISOString()
-  });
+  return response.status(200).json({ status: 'OK' });
 });
+
+// Plugar as rotas de transações no Express!
+app.use(transactionRoutes); // <-- Adicionamos esta linha
 
 export default app;

@@ -1,0 +1,27 @@
+import { TransactionRepository, CreateTransactionData } from '../repositories/transaction.repository';
+
+export const TransactionService = {
+  // O Service recebe os dados, valida as regras e depois manda para o Repository
+  async create(data: CreateTransactionData) {
+    
+    // Regra 1: A descrição precisa ter pelo menos 3 caracteres
+    if (!data.description || data.description.trim().length < 3) {
+      throw new Error("A descrição deve ter pelo menos 3 caracteres.");
+    }
+
+    // Regra 2: O valor tem que ser maior que zero
+    if (data.amount <= 0) {
+      throw new Error("O valor da transação deve ser maior que zero.");
+    }
+
+    // Regra 3: Só aceitamos 'income' (receitas) ou 'expense' (despesas)
+    if (data.type !== 'income' && data.type !== 'expense') {
+      throw new Error("O tipo deve ser 'income' ou 'expense'.");
+    }
+
+    // Se passou por todas as validações, chamamos o Repository para salvar no MySQL!
+    const transaction = await TransactionRepository.create(data);
+    
+    return transaction;
+  }
+};
