@@ -39,6 +39,12 @@ export const TransactionService = {
 
     const transaction = await TransactionRepository.update(id, data);
     return transaction;
+  },
+
+  async delete(id: string) {
+    // Aqui poderíamos ter uma regra tipo "Não pode apagar contas já pagas", 
+    // mas por enquanto vamos deixar excluir qualquer uma.
+    await TransactionRepository.delete(id);
   }
 
 };

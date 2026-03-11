@@ -13,4 +13,7 @@ transactionRoutes.get('/transactions', TransactionController.list);
 // O ":id" avisa o Express que ali virá um valor dinâmico
 transactionRoutes.put('/transactions/:id', TransactionController.update);
 
+// Rota para EXCLUIR uma transação específica (DELETE)
+transactionRoutes.delete('/transactions/:id', TransactionController.delete);
+
 export default transactionRoutes;

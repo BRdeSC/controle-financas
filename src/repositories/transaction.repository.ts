@@ -52,6 +52,14 @@ export const TransactionRepository = {
       }
     });
     return transaction;
+  },
+
+  // Função para excluir uma transação
+  async delete(id: string) {
+    const transaction = await prisma.transaction.delete({
+      where: { id: id }
+    });
+    return transaction;
   }
-  
+
 };

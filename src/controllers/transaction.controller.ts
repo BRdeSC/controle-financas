@@ -40,6 +40,19 @@ export const TransactionController = {
     } catch (error: any) {
       return res.status(400).json({ error: "Erro ao atualizar a transação. Verifique se o ID está correto." });
     }
+  },
+
+  async delete(req: Request, res: Response) {
+    try {
+      const id = req.params.id; // Pega o ID da URL
+
+      await TransactionService.delete(id);
+      
+      // Status 204 significa "No Content" (Sucesso, mas não tem nada para devolver na tela)
+      return res.status(204).send(); 
+    } catch (error: any) {
+      return res.status(400).json({ error: "Erro ao excluir. Verifique se o ID existe." });
+    }
   }
 
 };
