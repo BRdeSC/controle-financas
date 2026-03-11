@@ -28,5 +28,17 @@ export const TransactionService = {
   async findAll() {
     const transactions = await TransactionRepository.findAll();
     return transactions;
+  },
+
+  async update(id: string, data: Partial<CreateTransactionData>) {
+    // Regra de Negócio: Se o status que vier for "paid" (pago) e não tiver data de pagamento, 
+    // nós preenchemos automaticamente com a data e hora de agora!
+    if (data.status === 'paid' && !data.paymentDate) {
+      data.paymentDate = new Date();
+    }
+
+    const transaction = await TransactionRepository.update(id, data);
+    return transaction;
   }
+
 };

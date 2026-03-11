@@ -27,5 +27,19 @@ export const TransactionController = {
     } catch (error: any) {
       return res.status(500).json({ error: "Erro interno ao buscar transações." });
     }
+  },
+
+  async update(req: Request, res: Response) {
+    try {
+      const id = req.params.id; // Pega o ID que vem na URL (ex: /transactions/123)
+      const data = req.body;    // Pega os dados que queremos mudar (ex: { status: "paid" })
+
+      const transaction = await TransactionService.update(id, data);
+      
+      return res.status(200).json(transaction);
+    } catch (error: any) {
+      return res.status(400).json({ error: "Erro ao atualizar a transação. Verifique se o ID está correto." });
+    }
   }
+
 };

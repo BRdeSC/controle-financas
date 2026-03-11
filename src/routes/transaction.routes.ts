@@ -9,4 +9,8 @@ transactionRoutes.post('/transactions', TransactionController.create);
 // Rota para LISTAR as transações (GET)
 transactionRoutes.get('/transactions', TransactionController.list);
 
+// Rota para ATUALIZAR uma transação específica (PUT)
+// O ":id" avisa o Express que ali virá um valor dinâmico
+transactionRoutes.put('/transactions/:id', TransactionController.update);
+
 export default transactionRoutes;

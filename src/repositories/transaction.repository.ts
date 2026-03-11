@@ -32,9 +32,26 @@ export const TransactionRepository = {
   async findAll() {
     const transactions = await prisma.transaction.findMany({
       orderBy: {
-        dueDate: 'asc' // Já vamos trazer ordenado pela data de vencimento (das mais antigas para as mais novas)!
+        dueDate: 'asc' // Já traz ordenado pela data de vencimento (das mais antigas para as mais novas)!
       }
     });
     return transactions;
+  },
+
+  // Função para atualizar uma transação existente
+  async update(id: string, data: Partial<CreateTransactionData>) {
+    const transaction = await prisma.transaction.update({
+      where: { id: id },
+      data: {
+        description: data.description,
+        amount: data.amount,
+        type: data.type,
+        dueDate: data.dueDate,
+        paymentDate: data.paymentDate,
+        status: data.status,
+      }
+    });
+    return transaction;
   }
+  
 };
