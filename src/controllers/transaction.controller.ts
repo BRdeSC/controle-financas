@@ -18,5 +18,14 @@ export const TransactionController = {
       // Status 400 significa "Bad Request" (O cliente mandou algo errado)
       return res.status(400).json({ error: error.message });
     }
+  },
+
+  async list(req: Request, res: Response) {
+    try {
+      const transactions = await TransactionService.findAll();
+      return res.status(200).json(transactions);
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro interno ao buscar transações." });
+    }
   }
 };

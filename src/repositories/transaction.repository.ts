@@ -27,5 +27,14 @@ export const TransactionRepository = {
     });
     
     return transaction;
+  },
+
+  async findAll() {
+    const transactions = await prisma.transaction.findMany({
+      orderBy: {
+        dueDate: 'asc' // Já vamos trazer ordenado pela data de vencimento (das mais antigas para as mais novas)!
+      }
+    });
+    return transactions;
   }
 };

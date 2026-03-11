@@ -23,5 +23,10 @@ export const TransactionService = {
     const transaction = await TransactionRepository.create(data);
     
     return transaction;
+  },
+
+  async findAll() {
+    const transactions = await TransactionRepository.findAll();
+    return transactions;
   }
 };
