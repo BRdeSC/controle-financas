@@ -9,7 +9,7 @@ export interface CreateTransactionData {
   type: string;
   dueDate: Date;
   paymentDate?: Date; // Opcional
-  status?: string;    // Opcional
+  status?: string; // Opcional
 }
 
 export const TransactionRepository = {
@@ -25,15 +25,15 @@ export const TransactionRepository = {
         status: data.status,
       },
     });
-    
+
     return transaction;
   },
 
   async findAll() {
     const transactions = await prisma.transaction.findMany({
       orderBy: {
-        dueDate: 'asc' // Já traz ordenado pela data de vencimento (das mais antigas para as mais novas)!
-      }
+        dueDate: 'asc', // Já traz ordenado pela data de vencimento (das mais antigas para as mais novas)!
+      },
     });
     return transactions;
   },
@@ -49,7 +49,7 @@ export const TransactionRepository = {
         dueDate: data.dueDate,
         paymentDate: data.paymentDate,
         status: data.status,
-      }
+      },
     });
     return transaction;
   },
@@ -57,9 +57,8 @@ export const TransactionRepository = {
   // Função para excluir uma transação
   async delete(id: string) {
     const transaction = await prisma.transaction.delete({
-      where: { id: id }
+      where: { id: id },
     });
     return transaction;
-  }
-
+  },
 };

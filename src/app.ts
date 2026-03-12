@@ -1,8 +1,10 @@
 import express from 'express';
+import cors from 'cors';
 import transactionRoutes from './routes/transaction.routes'; // <-- Importamos as rotas aqui
 
 const app = express();
 
+app.use(cors()); // <-- 2. Avisando o Express para permitir ligações externas
 app.use(express.json());
 
 // Rota de teste
