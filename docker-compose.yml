@@ -1,17 +1,42 @@
 services:
-  mysql:
+  # 1. Banco de Dados MySQL
+  db:
     image: mysql:8.0
-    container_name: mysql_controle_contas
+    container_name: financas-mysql
     restart: always
-    ports:
-      - "3307:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: controle_financas
+    ports:
+      - "3308:3306"
     volumes:
       - mysql_data:/var/lib/mysql
+
+  # 2. API Node.js (Backend)
+  api:
+    build: ./backend 
+    container_name: financas-api
+    restart: always
+    ports:
+      - "3333:3333"
+    depends_on:
+      - db # O Backend só liga DEPOIS que o banco de dados estiver pronto
+    environment:
+      # O Segredo da Nuvem: O Backend agora fala com o "db" em vez de "localhost"
+      - DATABASE_URL=mysql://root:root@db:3306/controle_financas
+
+  # 3. A Tela React (Frontend)
+  web:
+    build: ./frontend # Procura o Dockerfile na pasta do frontend
+    container_name: financas-web
+    restart: always
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api # O Frontend só liga DEPOIS que a API estiver pronta
+    # Opcional mas recomendado: Mapeamos a pasta src para não perdermos o "Hot Reload"
+    volumes:
+      - ./frontend/src:/app/src
 
 volumes:
   mysql_data:

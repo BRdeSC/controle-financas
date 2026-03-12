@@ -149,7 +149,7 @@ function App() {
             onClick={() => handleToggleStatus(conta.id, conta.status)}
             style={{ padding: '6px 12px', background: conta.status === 'pending' ? '#28a745' : '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', minWidth: '85px' }}
           >
-            {conta.status === 'pending' ? 'Dar OK' : 'Desfazer'}
+            {conta.status === 'pending' ? 'Paga' : 'Desfazer'}
           </button>
         )}
       </div>
@@ -157,7 +157,7 @@ function App() {
   );
 
   const isExpense = type === 'expense'; // Retorna true se for despesa
-  const tituloFormulario = editingId ? `✏️ Editar ${isExpense ? 'Conta' : 'Receita'}` : `➕ Nova ${isExpense ? 'Conta' : 'Receita'}`;
+  const tituloFormulario = editingId ? `✏️ Editar ${isExpense ? 'Conta' : 'Receita'}` : `Adicionar Nova ${isExpense ? 'Conta' : 'Receita'}`;
   const placeholderDescricao = isExpense ? 'Digite o nome da conta (ex: Casa, Luz)' : 'Digite o nome da receita (ex: Salário, Vendas)';
   const textoBotao = editingId ? 'Salvar Alterações' : `Adicionar ${isExpense ? 'Conta' : 'Receita'}`;
 
