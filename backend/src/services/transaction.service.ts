@@ -5,55 +5,55 @@ import {
 
 export const TransactionService = {
 
-  // Adicione dentro do TransactionService
-  async findByMonth(month: number, year: number) {
-    // Aqui você pode adicionar alguma regra de negócio se precisar, 
-    // por exemplo, validar se o mês está entre 1 e 12.
-    return await TransactionRepository.findByMonth(month, year);
+  async findByMonth(month: number, year: number, userId: string) {
+    // Validamos se o mês faz sentido antes de ir ao banco
+    if (month < 1 || month > 12) {
+      throw new Error('Mês inválido. Deve ser entre 1 e 12.');
+    }
+    return await TransactionRepository.findByMonth(month, year, userId);
   },
 
-  // O Service recebe os dados, valida as regras e depois manda para o Repository
   async create(data: CreateTransactionData) {
-    // Regra 1: A descrição precisa ter pelo menos 3 caracteres
+    // Mantemos suas validações de negócio
     if (!data.description || data.description.trim().length < 3) {
       throw new Error('A descrição deve ter pelo menos 3 caracteres.');
     }
 
-    // Regra 2: O valor tem que ser maior que zero
     if (data.amount <= 0) {
       throw new Error('O valor da transação deve ser maior que zero.');
     }
 
-    // Regra 3: Só aceitamos 'income' (receitas) ou 'expense' (despesas)
-    if (data.type !== 'income' && data.type !== 'expense') {
-      throw new Error("O tipo deve ser 'income' ou 'expense'.");
-    }
-
-    // Se passou por todas as validações, chamamos o Repository para salvar no MySQL!
+    // O Repository usará o data.userId que já está dentro do objeto 'data'
     const transaction = await TransactionRepository.create(data);
-
     return transaction;
   },
 
-  async findAll() {
-    const transactions = await TransactionRepository.findAll();
-    return transactions;
+  async findAll(userId: string) {
+    return await TransactionRepository.findAll(userId);
   },
 
-  async update(id: string, data: Partial<CreateTransactionData>) {
-    // Regra de Negócio: Se o status que vier for "paid" (pago) e não tiver data de pagamento,
-    // nós preenchemos automaticamente com a data e hora de agora!
+  async update(id: string, userId: string, data: Partial<CreateTransactionData>) {
     if (data.status === 'paid' && !data.paymentDate) {
       data.paymentDate = new Date();
     }
 
-    const transaction = await TransactionRepository.update(id, data);
+    // Passamos o userId para garantir que só o dono atualize
+    const transaction = await TransactionRepository.update(id, userId, data);
+    
+    if (!transaction) {
+      throw new Error('Transação não encontrada ou você não tem permissão.');
+    }
+    
     return transaction;
   },
 
-  async delete(id: string) {
-    // Aqui poderíamos ter uma regra tipo "Não pode apagar contas já pagas",
-    // mas por enquanto vamos deixar excluir qualquer uma.
-    await TransactionRepository.delete(id);
+  async delete(id: string, userId: string) {
+    // Aqui garantimos que o 'delete' só ocorra se o dono for o mesmo do token
+    const result = await TransactionRepository.delete(id, userId);
+    
+    // Se o Prisma não deletar nada (porque o ID ou User não batem), avisamos o erro
+    if (result.count === 0) {
+      throw new Error('Não foi possível excluir: transação não encontrada ou sem permissão.');
+    }
   },
 };

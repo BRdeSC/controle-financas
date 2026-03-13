@@ -1,23 +1,28 @@
 import { Router } from 'express';
 import { TransactionController } from '../controllers/transaction.controller';
+import { authMiddleware } from '../middlewares/auth.middleware'; // Importe o middleware
 
 const transactionRoutes = Router();
 
-// Rota para CRIAR uma transação (POST)
-transactionRoutes.post('/transactions', TransactionController.create);
+console.log(">>> ARQUIVO DE ROTAS DE TRANSAÇÃO FOI LIDO PELO NODE <<<");
 
-// 2. Rota para FILTRAR transações por mês (GET)
-// Adicionamos ANTES da rota de ID para evitar conflitos
-transactionRoutes.get('/transactions/filter', TransactionController.listByMonth);
+// Aplica o middleware em todas as rotas abaixo
+// A partir daqui, NINGUÉM passa sem o Token JWT
+transactionRoutes.use(authMiddleware);
 
-// Rota para LISTAR as transações (GET)
-transactionRoutes.get('/transactions', TransactionController.list);
+// Rota para CRIAR (POST /transactions)
+transactionRoutes.post('/', TransactionController.create);
 
-// Rota para ATUALIZAR uma transação específica (PUT)
-// O ":id" avisa o Express que ali virá um valor dinâmico
-transactionRoutes.put('/transactions/:id', TransactionController.update);
+// Rota para FILTRAR (GET /transactions/filter)
+transactionRoutes.get('/filter', TransactionController.listByMonth);
 
-// Rota para EXCLUIR uma transação específica (DELETE)
-transactionRoutes.delete('/transactions/:id', TransactionController.delete);
+// Rota para LISTAR (GET /transactions)
+transactionRoutes.get('/', TransactionController.list);
+
+// Rota para ATUALIZAR (PUT /transactions/:id)
+transactionRoutes.put('/:id', TransactionController.update);
+
+// Rota para EXCLUIR (DELETE /transactions/:id)
+transactionRoutes.delete('/:id', TransactionController.delete);
 
 export default transactionRoutes;

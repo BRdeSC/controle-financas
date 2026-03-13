@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
-import transactionRoutes from './routes/transaction.routes'; // <-- Importamos as rotas aqui
+import transactionRoutes from './routes/transaction.routes';
+import authRoutes from './routes/auth.routes';
 
 const app = express();
 
@@ -13,6 +14,10 @@ app.get('/health', (request, response) => {
 });
 
 // Plugar as rotas de transações no Express!
-app.use(transactionRoutes); // <-- Adicionamos esta linha
+app.use('/auth', authRoutes);
+console.log("Tentando carregar rotas de transação...");
+
+app.use('/transactions', transactionRoutes);
+console.log("Rotas de transação plugadas!");
 
 export default app;

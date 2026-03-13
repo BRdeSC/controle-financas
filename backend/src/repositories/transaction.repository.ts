@@ -2,66 +2,69 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-// Formato dos dados que o Repository espera receber
 export interface CreateTransactionData {
   description: string;
   amount: number;
   type: string;
   dueDate: Date;
-  paymentDate?: Date; // Opcional
-  status?: string; // Opcional
+  paymentDate?: Date;
+  status?: string;
+  userId: string; // <-- Essencial agora!
 }
 
 export const TransactionRepository = {
 
-  async findByMonth(month: number, year: number) {
-  // Calculamos o primeiro e o último dia do mês para o filtro
-  const startDate = new Date(year, month - 1, 1);
-  const endDate = new Date(year, month, 0, 23, 59, 59);
+  async findByMonth(month: number, year: number, userId: string) {
+    const startDate = new Date(year, month - 1, 1);
+    const endDate = new Date(year, month, 0, 23, 59, 59);
 
-  return await prisma.transaction.findMany({
-    where: {
-      dueDate: {
-        gte: startDate,
-        lte: endDate,
+    return await prisma.transaction.findMany({
+      where: {
+        userId, // Filtra pelo dono
+        dueDate: {
+          gte: startDate,
+          lte: endDate,
+        },
       },
-    },
-    orderBy: {
-      dueDate: 'desc',
-    },
-  });
-},
-
-
-  // Função para criar uma transação na base de dados
-  async create(data: CreateTransactionData) {
-    const transaction = await prisma.transaction.create({
-      data: {
-        description: data.description,
-        amount: data.amount,
-        type: data.type,
-        dueDate: data.dueDate,
-        paymentDate: data.paymentDate,
-        status: data.status,
-      },
-    });
-
-    return transaction;
-  },
-
-  async findAll() {
-    const transactions = await prisma.transaction.findMany({
       orderBy: {
-        dueDate: 'asc', // Já traz ordenado pela data de vencimento (das mais antigas para as mais novas)!
+        dueDate: 'desc',
       },
     });
-    return transactions;
   },
 
-  // Função para atualizar uma transação existente
-  async update(id: string, data: Partial<CreateTransactionData>) {
-    const transaction = await prisma.transaction.update({
-      where: { id: id },
+  async create(data: CreateTransactionData) {
+    return await prisma.transaction.create({
+      data: {
+        description: data.description,
+        amount: data.amount,
+        type: data.type,
+        dueDate: data.dueDate,
+        paymentDate: data.paymentDate,
+        status: data.status,
+        // Em vez de passar o campo userId direto, usamos a conexão de objeto
+        user: {
+          connect: { id: data.userId }
+        }
+      },
+    });
+  },
+
+  async findAll(userId: string) {
+    return await prisma.transaction.findMany({
+      where: { userId }, // Só traz as transações do dono do token
+      orderBy: {
+        dueDate: 'asc',
+      },
+    });
+  },
+
+  async update(id: string, userId: string, data: Partial<CreateTransactionData>) {
+    // Usamos updateMany para garantir que o id pertença ao userId
+    const updateResult = await prisma.transaction.updateMany({
+      where: { 
+        id: id,
+        userId: userId 
+      },
       data: {
         description: data.description,
         amount: data.amount,
@@ -71,14 +74,21 @@ export const TransactionRepository = {
         status: data.status,
       },
     });
-    return transaction;
+
+    // Como updateMany não retorna o objeto, buscamos ele se houve alteração
+    if (updateResult.count > 0) {
+      return await prisma.transaction.findUnique({ where: { id } });
+    }
+    return null;
   },
 
-  // Função para excluir uma transação
-  async delete(id: string) {
-    const transaction = await prisma.transaction.delete({
-      where: { id: id },
+  async delete(id: string, userId: string) {
+    // Segurança máxima: só deleta se o ID e o User baterem
+    return await prisma.transaction.deleteMany({
+      where: { 
+        id: id,
+        userId: userId 
+      },
     });
-    return transaction;
   },
 };

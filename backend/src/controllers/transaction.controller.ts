@@ -6,78 +6,67 @@ export const TransactionController = {
   async listByMonth(req: Request, res: Response) {
     try {
       const { month, year } = req.query;
-
+      const userId = (req as any).userId;
       if (!month || !year) {
         return res.status(400).json({ error: "Mês e Ano são obrigatórios na URL." });
       }
 
+      // Passamos o userId para o service filtrar apenas as DESTE usuário
       const transactions = await TransactionService.findByMonth(
         Number(month),
-        Number(year)
+        Number(year),
+        userId 
       );
 
       return res.status(200).json(transactions);
     } catch (error: any) {
-      console.error(error);
       return res.status(500).json({ error: 'Erro ao filtrar transações.' });
     }
   },
 
   async create(req: Request, res: Response) {
     try {
-      // 1. Pega os dados que vieram no corpo da requisição (JSON)
-      const data = req.body;
-
-      // 2. Passa para o Service fazer a mágica e aplicar as regras
-      const transaction = await TransactionService.create(data);
-
-      // 3. Devolve a transação criada com o status 201 (Created)
+      const userId = (req as any).userId; // Pegue aqui
+      const transaction = await TransactionService.create({ ...req.body, userId });
       return res.status(201).json(transaction);
     } catch (error: any) {
-      console.error(error);
-      // Se o Service lançou um erro (ex: valor menor que zero), cai aqui no catch
-      // Status 400 significa "Bad Request" (O cliente mandou algo errado)
       return res.status(400).json({ error: error.message });
     }
   },
 
   async list(req: Request, res: Response) {
     try {
-      const transactions = await TransactionService.findAll();
+      // MUDE AQUI: Estava pegando de req.body, mude para o (req as any)
+      const userId = (req as any).userId; 
+      const transactions = await TransactionService.findAll(userId);
       return res.status(200).json(transactions);
     } catch (error: any) {
-      console.error(error);
       return res.status(500).json({ error: 'Erro interno ao buscar transações.' });
     }
   },
 
   async update(req: Request, res: Response) {
     try {
-      const id = req.params.id; // Pega o ID que vem na URL (ex: /transactions/123)
-      const data = req.body; // Pega os dados que queremos mudar (ex: { status: "paid" })
+      const id = req.params.id;
+      const userId = (req as any).userId; // Pegue aqui
+      const data = req.body; 
 
-      const transaction = await TransactionService.update(id, data);
-
+      const transaction = await TransactionService.update(id, userId, data);
       return res.status(200).json(transaction);
     } catch (error: any) {
-      console.error(error);
-      return res
-        .status(400)
-        .json({ error: 'Erro ao atualizar a transação. Verifique se o ID está correto.' });
+      return res.status(400).json({ error: error.message });
     }
   },
 
   async delete(req: Request, res: Response) {
     try {
-      const id = req.params.id; // Pega o ID da URL
+      const id = req.params.id;
+      const userId = (req as any).userId; // Pegue aqui
 
-      await TransactionService.delete(id);
-
-      // Status 204 significa "No Content" (Sucesso, mas não tem nada para devolver na tela)
+      await TransactionService.delete(id, userId);
       return res.status(204).send();
     } catch (error: any) {
-      console.error(error);
-      return res.status(400).json({ error: 'Erro ao excluir. Verifique se o ID existe.' });
+      return res.status(400).json({ error: error.message });
     }
   },
 };
