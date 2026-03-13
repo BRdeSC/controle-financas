@@ -2,6 +2,27 @@ import { Request, Response } from 'express';
 import { TransactionService } from '../services/transaction.service';
 
 export const TransactionController = {
+
+  async listByMonth(req: Request, res: Response) {
+    try {
+      const { month, year } = req.query;
+
+      if (!month || !year) {
+        return res.status(400).json({ error: "Mês e Ano são obrigatórios na URL." });
+      }
+
+      const transactions = await TransactionService.findByMonth(
+        Number(month),
+        Number(year)
+      );
+
+      return res.status(200).json(transactions);
+    } catch (error: any) {
+      console.error(error);
+      return res.status(500).json({ error: 'Erro ao filtrar transações.' });
+    }
+  },
+
   async create(req: Request, res: Response) {
     try {
       // 1. Pega os dados que vieram no corpo da requisição (JSON)

@@ -4,29 +4,35 @@ import type { Transaction } from './types/Transaction';
 import './App.css';
 
 function App() {
+  // 1. ESTADOS (Definidos no topo para evitar erros de inicialização)
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
 
   // Estados do Formulário
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [type, setType] = useState<'income' | 'expense'>('expense');
-  
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  // 2. FUNÇÃO DE CARREGAMENTO (Fonte da verdade: Banco de Dados)
   async function loadTransactions() {
     try {
-      const response = await api.get('/transactions');
+      console.log(`Buscando dados para: ${selectedMonth}/${selectedYear}`);
+      const response = await api.get(`/transactions/filter?month=${selectedMonth}&year=${selectedYear}`);
       setTransactions(response.data);
     } catch (error) {
-      console.error("Erro ao buscar contas:", error);
+      console.error("Erro ao buscar contas filtradas:", error);
     }
   }
 
+  // 3. EFEITO COLATERAL (Gatilho para mudar o mês/ano)
   useEffect(() => {
     loadTransactions();
-  }, []);
+  }, [selectedMonth, selectedYear]);
 
+  // 4. FUNÇÕES DE MANIPULAÇÃO
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
 
@@ -40,13 +46,16 @@ function App() {
 
       if (editingId) {
         const response = await api.put(`/transactions/${editingId}`, payload);
+        // Atualiza a lista localmente mantendo a ordem
         setTransactions(transactions.map(t => t.id === editingId ? response.data : t));
         setEditingId(null); 
       } else {
-        const response = await api.post('/transactions', { ...payload, status: 'pending' });
-        setTransactions([...transactions, response.data]);
+        await api.post('/transactions', { ...payload, status: 'pending' });
+        // RECARREGA do banco para garantir que a nova conta respeita o filtro atual
+        loadTransactions();
       }
 
+      // Limpa o formulário
       setDescription(''); setAmount(''); setDueDate(''); setType('expense');
     } catch (error) {
       console.error("Erro ao salvar:", error);
@@ -91,7 +100,7 @@ function App() {
     }
   }
 
-  // --- SEPARAÇÃO E CÁLCULOS DO DASHBOARD ---
+  // --- CÁLCULOS DO DASHBOARD (Baseados no que o filtro retornou) ---
   const sortedTransactions = [...transactions].sort((a, b) => 
     new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
   );
@@ -106,7 +115,7 @@ function App() {
   const saldoAtual = totalReceitas - despesasPagas; 
   const saldoProjetado = totalReceitas - todasDespesas;
 
-  // --- FUNÇÃO AUXILIAR PARA RENDERIZAR AS LINHAS ---
+  // --- RENDERIZAÇÃO DE ITENS ---
   const renderItem = (conta: Transaction) => (
     <li key={conta.id} style={{ 
       borderBottom: '1px solid #ccc', padding: '12px', 
@@ -124,7 +133,6 @@ function App() {
           R$ {conta.amount.toFixed(2)}
         </span>
         
-        {/* SÓ MOSTRA O TEXTO PENDENTE/PAGO SE FOR DESPESA */}
         {conta.type === 'expense' && (
           <>
             <span style={{ color: '#888' }}>-</span>
@@ -136,14 +144,8 @@ function App() {
       </div>
 
       <div style={{ display: 'flex', gap: '5px' }}>
-        <button onClick={() => handleEditClick(conta)} style={{ padding: '6px', background: '#ffc107', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Editar">
-          ✏️
-        </button>
-        <button onClick={() => handleDelete(conta.id)} style={{ padding: '6px', background: '#dc3545', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white' }} title="Excluir">
-          🗑️
-        </button>
-        
-        {/* SÓ MOSTRA O BOTÃO "DAR OK" SE FOR DESPESA */}
+        <button onClick={() => handleEditClick(conta)} style={{ padding: '6px', background: '#ffc107', border: 'none', borderRadius: '4px', cursor: 'pointer' }} title="Editar">✏️</button>
+        <button onClick={() => handleDelete(conta.id)} style={{ padding: '6px', background: '#dc3545', border: 'none', borderRadius: '4px', cursor: 'pointer', color: 'white' }} title="Excluir">🗑️</button>
         {conta.type === 'expense' && (
           <button 
             onClick={() => handleToggleStatus(conta.id, conta.status)}
@@ -156,15 +158,48 @@ function App() {
     </li>
   );
 
-  const isExpense = type === 'expense'; // Retorna true se for despesa
+  const isExpense = type === 'expense';
   const tituloFormulario = editingId ? `✏️ Editar ${isExpense ? 'Conta' : 'Receita'}` : `Adicionar Nova ${isExpense ? 'Conta' : 'Receita'}`;
   const placeholderDescricao = isExpense ? 'Digite o nome da conta (ex: Casa, Luz)' : 'Digite o nome da receita (ex: Salário, Vendas)';
   const textoBotao = editingId ? 'Salvar Alterações' : `Adicionar ${isExpense ? 'Conta' : 'Receita'}`;
 
-
   return (
     <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto', fontFamily: 'sans-serif', color: '#222' }}>
       <h2 style={{ textAlign: 'center', color: '#fff' }}>💰 Controle de Contas do Mês</h2>
+
+      {/* SELETOR DE MÊS E ANO */}
+      <div style={{ 
+        display: 'flex', justifyContent: 'center', gap: '10px', 
+        marginBottom: '20px', padding: '10px', background: '#333', borderRadius: '8px' 
+      }}>
+        <select 
+          value={selectedMonth} 
+          onChange={(e) => setSelectedMonth(Number(e.target.value))}
+          style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          <option value={1}>Janeiro</option>
+          <option value={2}>Fevereiro</option>
+          <option value={3}>Março</option>
+          <option value={4}>Abril</option>
+          <option value={5}>Maio</option>
+          <option value={6}>Junho</option>
+          <option value={7}>Julho</option>
+          <option value={8}>Agosto</option>
+          <option value={9}>Setembro</option>
+          <option value={10}>Outubro</option>
+          <option value={11}>Novembro</option>
+          <option value={12}>Dezembro</option>
+        </select>
+
+        <select 
+          value={selectedYear} 
+          onChange={(e) => setSelectedYear(Number(e.target.value))}
+          style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+        >
+          <option value={2025}>2025</option>
+          <option value={2026}>2026</option>
+        </select>
+      </div>
       
       {/* Formulário */}
       <form onSubmit={handleSubmit} style={{ 
@@ -231,7 +266,7 @@ function App() {
         )}
       </div>
 
-      {/* DASHBOARD FINANCEIRO (RESUMO) */}
+      {/* DASHBOARD FINANCEIRO */}
       <div style={{ 
         display: 'flex', justifyContent: 'space-around', alignItems: 'center', flexWrap: 'wrap',
         background: '#fff', padding: '20px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' 

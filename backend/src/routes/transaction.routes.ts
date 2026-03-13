@@ -6,6 +6,10 @@ const transactionRoutes = Router();
 // Rota para CRIAR uma transação (POST)
 transactionRoutes.post('/transactions', TransactionController.create);
 
+// 2. Rota para FILTRAR transações por mês (GET)
+// Adicionamos ANTES da rota de ID para evitar conflitos
+transactionRoutes.get('/transactions/filter', TransactionController.listByMonth);
+
 // Rota para LISTAR as transações (GET)
 transactionRoutes.get('/transactions', TransactionController.list);
 

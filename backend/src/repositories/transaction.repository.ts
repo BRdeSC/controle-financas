@@ -13,6 +13,26 @@ export interface CreateTransactionData {
 }
 
 export const TransactionRepository = {
+
+  async findByMonth(month: number, year: number) {
+  // Calculamos o primeiro e o último dia do mês para o filtro
+  const startDate = new Date(year, month - 1, 1);
+  const endDate = new Date(year, month, 0, 23, 59, 59);
+
+  return await prisma.transaction.findMany({
+    where: {
+      dueDate: {
+        gte: startDate,
+        lte: endDate,
+      },
+    },
+    orderBy: {
+      dueDate: 'desc',
+    },
+  });
+},
+
+
   // Função para criar uma transação na base de dados
   async create(data: CreateTransactionData) {
     const transaction = await prisma.transaction.create({

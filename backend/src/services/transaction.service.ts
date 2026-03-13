@@ -4,6 +4,14 @@ import {
 } from '../repositories/transaction.repository';
 
 export const TransactionService = {
+
+  // Adicione dentro do TransactionService
+  async findByMonth(month: number, year: number) {
+    // Aqui você pode adicionar alguma regra de negócio se precisar, 
+    // por exemplo, validar se o mês está entre 1 e 12.
+    return await TransactionRepository.findByMonth(month, year);
+  },
+
   // O Service recebe os dados, valida as regras e depois manda para o Repository
   async create(data: CreateTransactionData) {
     // Regra 1: A descrição precisa ter pelo menos 3 caracteres

@@ -40,5 +40,48 @@ describe('Testes da API de Finanças', () => {
     // Verifica se a exclusão retornou 204 No Content (sucesso)
     expect(responseDelete.status).toBe(204);
   });
+  
+
+  it("Deve filtrar transações pelo mês correto (Março/2026)", async () => {
+  // 1. Primeiro, criamos uma conta em Março
+  const contaMarço = await request(app)
+    .post("/transactions")
+    .send({
+      description: "Conta de Março",
+      amount: 100,
+      type: "expense",
+      dueDate: "2026-03-15T10:00:00.000Z",
+      status: "pending"
+    });
+
+  // 2. Chamamos a rota de filtro para Março/2026
+  const response = await request(app)
+    .get("/transactions/filter")
+    .query({ month: 3, year: 2026 });
+
+  // 3. Verificações (Assertions)
+  expect(response.status).toBe(200);
+  expect(Array.isArray(response.body)).toBe(true);
+  
+  // Verifica se a conta que criamos está nos resultados
+  const contemConta = response.body.some(
+    (t: any) => t.description === "Conta de Março"
+  );
+  expect(contemConta).toBe(true);
+});
+
+it("Não deve mostrar a conta de Março quando filtrado por Abril", async () => {
+  const response = await request(app)
+    .get("/transactions/filter")
+    .query({ month: 4, year: 2026 });
+
+  const contemContaMarço = response.body.some(
+    (t: any) => t.description === "Conta de Março"
+  );
+  
+  // Aqui esperamos que seja falso, pois a conta é de outro mês
+  expect(contemContaMarço).toBe(false);
+});
+
 
 });
