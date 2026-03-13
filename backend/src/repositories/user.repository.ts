@@ -1,8 +1,15 @@
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import { prisma } from '../lib/prisma';
 
 export const UserRepository = {
+  async findByEmail(email: string) {
+    // Adicione esse log temporário para debug no teste
+    if (!prisma) { console.error("PRISMA ESTÁ UNDEFINED NO REPOSITORY"); }
+    
+    return await prisma.user.findUnique({
+      where: { email }
+    });
+  },
+
   async create(data: any) {
     return await prisma.user.create({
       data: {
@@ -10,12 +17,6 @@ export const UserRepository = {
         email: data.email,
         password: data.password,
       }
-    });
-  },
-
-  async findByEmail(email: string) {
-    return await prisma.user.findUnique({
-      where: { email }
     });
   }
 };
