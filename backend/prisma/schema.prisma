@@ -1,11 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
 }
 
 datasource db {
@@ -13,17 +8,35 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// Nossa tabela de Transações (Contas e Receitas)
-model Transaction {
-  id          String    @id @default(uuid())
-  description String
-  amount      Float
-  type        String    // 'income' (receita) ou 'expense' (despesa)
-  dueDate     DateTime  // Data de vencimento (Ex: o dia 17/02 da Luz)
-  paymentDate DateTime? // Data em que foi pago (O "?" significa que é opcional, pois pode não estar pago ainda)
-  status      String    @default("pending") // 'pending' (pendente) ou 'paid' (pago - o seu "OK")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+// Tabela de Usuários (O dono das contas)
+model User {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String        // Aqui vai a senha criptografada
+  transactions Transaction[] // Relação: Um usuário tem várias transações
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
 
-  @@map("transactions") // Nome real da tabela no MySQL
+  @@map("users")
+}
+
+// Tabela de Transações (Agora com dono!)
+model Transaction {
+  id           String   @id @default(uuid())
+  description  String
+  amount       Float
+  type         String   // 'income' ou 'expense'
+  dueDate      DateTime
+  paymentDate  DateTime?
+  status       String   @default("pending")
+  
+  // Relacionamento: Toda transação agora pertence a um User
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("transactions")
 }
