@@ -109,6 +109,12 @@ function Dashboard() {
     }
   }
 
+  function handleLogout() {
+    localStorage.removeItem('@AppFinancas:token');
+    localStorage.removeItem('@AppFinancas:user');
+    window.location.href = '/login';
+  }
+
   // --- CÁLCULOS DO DASHBOARD (Baseados no que o filtro retornou) ---
   const sortedTransactions = [...transactions].sort((a, b) => 
     new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
@@ -123,6 +129,13 @@ function Dashboard() {
   
   const saldoAtual = totalReceitas - despesasPagas; 
   const saldoProjetado = totalReceitas - todasDespesas;
+
+  const isExpense = type === 'expense';
+  const tituloFormulario = editingId ? `✏️ Editar ${isExpense ? 'Conta' : 'Receita'}` : `Adicionar Nova ${isExpense ? 'Conta' : 'Receita'}`;
+  const placeholderDescricao = isExpense ? 'Digite o nome da conta (ex: Casa, Luz)' : 'Digite o nome da receita (ex: Salário, Vendas)';
+  const textoBotao = editingId ? 'Salvar Alterações' : `Adicionar ${isExpense ? 'Conta' : 'Receita'}`;
+
+  const userStorage = localStorage.getItem('@AppFinancas:user');
 
   // --- RENDERIZAÇÃO DE ITENS ---
   const renderItem = (conta: Transaction) => (
@@ -167,18 +180,23 @@ function Dashboard() {
     </li>
   );
 
-  const isExpense = type === 'expense';
-  const tituloFormulario = editingId ? `✏️ Editar ${isExpense ? 'Conta' : 'Receita'}` : `Adicionar Nova ${isExpense ? 'Conta' : 'Receita'}`;
-  const placeholderDescricao = isExpense ? 'Digite o nome da conta (ex: Casa, Luz)' : 'Digite o nome da receita (ex: Salário, Vendas)';
-  const textoBotao = editingId ? 'Salvar Alterações' : `Adicionar ${isExpense ? 'Conta' : 'Receita'}`;
-
   return (
     <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto', fontFamily: 'sans-serif', color: '#222' }}>
-      <h2 style={{ textAlign: 'center', color: '#fff' }}>💰 Controle de Contas do Mês</h2>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <h2 style={{ color: '#fff', margin: 0 }}>
+        💰 Painel de contas - Usuário {user ? user.name : 'Minhas'}
+      </h2>
+      <button 
+        onClick={handleLogout} 
+        style={{ padding: '8px 16px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+      >
+        Sair 👋
+      </button>
+    </div>
 
       {/* SELETOR DE MÊS E ANO */}
       <div style={{ 
-        display: 'flex', justifyContent: 'center', gap: '10px', 
+        display: 'flex', justifyContent: 'center', gap: '20px', 
         marginBottom: '20px', padding: '10px', background: '#333', borderRadius: '8px' 
       }}>
         <select 

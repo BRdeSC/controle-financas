@@ -14,4 +14,26 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+// 2. Interceptor de RESPONSE (A Volta - O Guarda-costas do 401)
+api.interceptors.response.use(
+  (response) => {
+    return response; // Se deu 200 (Sucesso), segue o jogo
+  },
+  (error) => {
+    // Se o erro for 401 (Não Autorizado / Token Vencido)
+    if (error.response && error.response.status === 401) {
+      console.warn("Token inválido ou expirado. Deslogando...");
+      
+      // Limpa os dados velhos
+      localStorage.removeItem('@AppFinancas:token');
+      localStorage.removeItem('@AppFinancas:user');
+      
+      // Manda pro login
+      window.location.href = '/login';
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
 export default api;

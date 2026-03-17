@@ -1,16 +1,31 @@
 services:
-  # 1. Banco de Dados MySQL
+
+  # O NOVO MOTOR: PostgreSQL
   db:
-    image: mysql:8.0
-    container_name: financas-mysql
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: controle_financas
+    image: postgres:15-alpine
+    container_name: financas-postgres
+    restart: unless-stopped
     ports:
-      - "3308:3306"
+      - "5433:5432" # A porta padrão universal do Postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: financas
     volumes:
-      - mysql_data:/var/lib/mysql
+      - financas_pg_data:/var/lib/postgresql/data
+
+  # 1. Banco de Dados MySQL
+  # db:
+  #   image: mysql:8.0
+  #   container_name: financas-mysql
+  #   restart: always
+  #   environment:
+  #     MYSQL_ROOT_PASSWORD: root
+  #     MYSQL_DATABASE: controle_financas
+  #   ports:
+  #     - "3308:3306"
+  #   volumes:
+  #     - mysql_data:/var/lib/mysql
 
   # 2. API Node.js (Backend)
   api:
@@ -23,7 +38,7 @@ services:
       - db # O Backend só liga DEPOIS que o banco de dados estiver pronto
     environment:
       # O Segredo da Nuvem: O Backend agora fala com o "db" em vez de "localhost"
-      - DATABASE_URL=mysql://root:root@db:3306/controle_financas
+      - DATABASE_URL=postgresql://root:root@db:5432/financas?schema=public
 
   # 3. A Tela React (Frontend)
   web:
@@ -39,4 +54,5 @@ services:
       - ./frontend/src:/app/src
 
 volumes:
-  mysql_data:
+  #mysql_data:
+  financas_pg_data:
