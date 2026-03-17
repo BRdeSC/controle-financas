@@ -8,14 +8,15 @@ RUN npm install
 
 COPY . .
 
-# 1. Gera o Prisma Client
+# 1. Gera o Prisma
 RUN npx prisma generate
 
-# 2. Tenta compilar. Se der erro de tipo (TS), ele continua mesmo assim (--force)
-# Isso garante que a pasta /dist seja criada
+# 2. Tenta compilar (mesmo com erros de tipo)
 RUN ./node_modules/.bin/tsc --skipLibCheck || true
 
+# 3. Porta
 EXPOSE 3333
 
-# Comando de start direto no JS
-CMD ["node", "dist/server.js"]
+# 4. O COMANDO QUE MANTÉM LIGADO (Sem os colchetes [])
+# Usamos o formato de texto para o "&&" funcionar
+CMD node dist/server.js
