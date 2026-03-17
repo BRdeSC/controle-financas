@@ -14,8 +14,9 @@ COPY . .
 # 5. Geramos o cliente do Prisma para este novo sistema (Linux)
 RUN npx prisma generate
 
-# 6. Avisamos que este contentor fala pela porta 3333
+# 6. Avisamos a porta (O Render vai ler isso aqui)
 EXPOSE 3333
 
-# 7. O comando para ligar o servidor
-CMD ["npm", "run", "dev"]
+# 7. O COMANDO DE PRODUÇÃO (A MÁGICA)
+# Removemos os colchetes [] para o shell do Linux entender o "&&"
+CMD npx prisma db push && npm run dev

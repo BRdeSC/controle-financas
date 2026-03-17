@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:3333',
+  //baseURL: 'http://localhost:3333',
+  baseURL: "https://api-financas-backend-kr7n.onrender.com"
 });
 
 // Esse trecho abaixo é "mágico": ele tenta pegar o token do navegador 
