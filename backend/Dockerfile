@@ -11,12 +11,13 @@ RUN npm install
 # 4. Copiamos todo o nosso código para dentro do contentor
 COPY . .
 
-# 5. Geramos o cliente do Prisma para este novo sistema (Linux)
+# 5. Gerar o Prisma Client e o Build do TypeScript
 RUN npx prisma generate
+RUN npm run build
 
-# 6. Avisamos a porta (O Render vai ler isso aqui)
+# 6. Porta
 EXPOSE 3333
 
-# 7. O COMANDO DE PRODUÇÃO (A MÁGICA)
-# Removemos os colchetes [] para o shell do Linux entender o "&&"
-CMD npx prisma db push && npm run dev
+# 7. O Comando de Produção (Roda o código compilado)
+# Isso faz o servidor ligar em 1 segundo, evitando o timeout
+CMD npx prisma db push && node dist/server.js
