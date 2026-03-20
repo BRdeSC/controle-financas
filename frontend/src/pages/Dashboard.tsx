@@ -186,48 +186,57 @@ function Dashboard() {
       <h2 style={{ color: '#fff', margin: 0 }}>
         💰 Painel de contas
       </h2>
+      <h2 style={{ textAlign: 'center', color: '#fff' }}>
+        Usuário: {user ? user.name : 'Minhas'}
+      </h2>
     </div>
 
       {/* SELETOR DE MÊS E ANO */}
       <div style={{ 
-        display: 'flex', justifyContent: 'center', gap: '20px', 
-        marginBottom: '20px', padding: '10px', background: '#333', borderRadius: '8px' 
+        display: 'flex', justifyContent: 'space-between', gap: '20px', 
+        marginBottom: '20px', padding: '10px', background: '#333', borderRadius: '8px', height: '40px' 
       }}>
-        <select 
-          value={selectedMonth} 
-          onChange={(e) => setSelectedMonth(Number(e.target.value))}
-          style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          <option value={1}>Janeiro</option>
-          <option value={2}>Fevereiro</option>
-          <option value={3}>Março</option>
-          <option value={4}>Abril</option>
-          <option value={5}>Maio</option>
-          <option value={6}>Junho</option>
-          <option value={7}>Julho</option>
-          <option value={8}>Agosto</option>
-          <option value={9}>Setembro</option>
-          <option value={10}>Outubro</option>
-          <option value={11}>Novembro</option>
-          <option value={12}>Dezembro</option>
-        </select>
+        <div style={{ display: 'flex', gap: '10px' }}>
 
-        <select 
-          value={selectedYear} 
-          onChange={(e) => setSelectedYear(Number(e.target.value))}
-          style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-        >
-          <option value={2025}>2025</option>
-          <option value={2026}>2026</option>
-        </select>
+          <select 
+            value={selectedYear} 
+            onChange={(e) => setSelectedYear(Number(e.target.value))}
+            style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <option value={2025}>2020</option>
+            <option value={2025}>2021</option>
+            <option value={2025}>2022</option>
+            <option value={2025}>2023</option>
+            <option value={2025}>2024</option>
+            <option value={2025}>2025</option>
+            <option value={2026}>2026</option>
+          </select>
 
-        <h2 style={{ textAlign: 'center', color: '#fff' }}>
-          Usuário {user ? user.name : 'Minhas'}
-        </h2>
+          <select 
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(Number(e.target.value))}
+            style={{ padding: '8px', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            <option value={1}>Janeiro</option>
+            <option value={2}>Fevereiro</option>
+            <option value={3}>Março</option>
+            <option value={4}>Abril</option>
+            <option value={5}>Maio</option>
+            <option value={6}>Junho</option>
+            <option value={7}>Julho</option>
+            <option value={8}>Agosto</option>
+            <option value={9}>Setembro</option>
+            <option value={10}>Outubro</option>
+            <option value={11}>Novembro</option>
+            <option value={12}>Dezembro</option>
+          </select>
+        </div>
 
-        <button onClick={handleLogout} style={{ float: 'right', background: '#333', color: '#fff' }}>
-          Sair
-        </button>
+        <div>
+          <button onClick={handleLogout} style={{ float: 'right', background: '#333', color: '#fff' }}>
+            Sair
+          </button>
+        </div>
       </div>
       
       {/* Formulário */}
