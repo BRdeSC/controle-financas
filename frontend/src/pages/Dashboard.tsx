@@ -184,14 +184,8 @@ function Dashboard() {
     <div style={{ padding: '20px', maxWidth: '900px', margin: '0 auto', fontFamily: 'sans-serif', color: '#222' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
       <h2 style={{ color: '#fff', margin: 0 }}>
-        💰 Painel de contas - Usuário {user ? user.name : 'Minhas'}
+        💰 Painel de contas
       </h2>
-      <button 
-        onClick={handleLogout} 
-        style={{ padding: '8px 16px', background: '#dc3545', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-      >
-        Sair 👋
-      </button>
     </div>
 
       {/* SELETOR DE MÊS E ANO */}
