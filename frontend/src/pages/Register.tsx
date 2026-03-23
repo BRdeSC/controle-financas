@@ -19,12 +19,13 @@ export function Register() {
 
   return (
     <div className="auth-container">
-      <form onSubmit={handleRegister}>
+      <form onSubmit={handleRegister}
+      style={{ display: 'flex', flexDirection: 'column', gap: '20px', width: '300px'  }}>
         <h2>Criar Conta</h2>
         <input type="text" placeholder="Nome" onChange={e => setName(e.target.value)} required />
         <input type="email" placeholder="E-mail" onChange={e => setEmail(e.target.value)} required />
         <input type="password" placeholder="Senha" onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Cadastrar</button>
+        <button style={{marginTop: '20px'}} type="submit">Cadastrar</button>
       </form>
     </div>
   );

@@ -24,11 +24,12 @@ export function Login() {
 
   return (
     <div className="auth-container">
-      <form onSubmit={handleLogin}>
+      <form onSubmit={handleLogin}
+      style={{ display: 'flex', flexDirection: 'column', gap: '10px', width: '300px'  }}>
         <h2>Acessar Minhas Contas</h2>
         <input type="email" placeholder="E-mail" onChange={e => setEmail(e.target.value)} required />
         <input type="password" placeholder="Senha" onChange={e => setPassword(e.target.value)} required />
-        <button type="submit">Entrar</button>
+        <button style={{marginTop: '20px'}} type="submit">Entrar</button>
         <p>Não tem conta? <a href="/register">Cadastre-se</a></p>
       </form>
     </div>
